@@ -1,28 +1,35 @@
 package com.roberterrera.dagger2;
 
-import android.app.Activity;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.TextView;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
-import com.roberterrera.dagger2.classes.MyApplication;
-import com.roberterrera.dagger2.classes.NetworkApi;
+import com.roberterrera.dagger2.model.DaggerVehicleComponent;
+import com.roberterrera.dagger2.model.Vehicle;
+import com.roberterrera.dagger2.model.VehicleComponent;
+import com.roberterrera.dagger2.module.VehicleModule;
 
-import javax.inject.Inject;
+public class MainActivity extends AppCompatActivity {
 
-public class MainActivity extends Activity {
+    Vehicle vehicle;
 
-    @Inject
-    NetworkApi networkApi;
+    /**
+     * See http://code.tutsplus.com/tutorials/dependency-injection-with-dagger-2-on-android--cms-23345
+     * for tutorial.
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ((MyApplication) getApplication()).getComponent().inject(this);
 
-        boolean injected =  networkApi == null ? false : true;
-        TextView userAvailable = (TextView) findViewById(R.id.target);
-        userAvailable.setText("Dependency injection worked: " + String.valueOf(injected));
+        VehicleComponent component = DaggerVehicleComponent.builder()
+                .vehicleModule(new VehicleModule()).build();
+
+        vehicle = component.provideVehicle();
+
+        Toast.makeText(this, String.valueOf(vehicle.getSpeed()), Toast.LENGTH_SHORT).show();
     }
 }
